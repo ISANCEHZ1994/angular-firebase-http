@@ -30,6 +30,9 @@ export class AppComponent implements OnInit {
         // the httpClient will give you more than just the response
         // it will automatically extract the data attached to the response (the repsonse body)
         console.log(responseData);
+
+        // if you visit the url below - you can see the newly created posts with their title and content 
+        // https://console.firebase.google.com/project/angular-firebase-ff3a9/database/angular-firebase-ff3a9-default-rtdb/data        
       });
       
       // in the web browser - developer tools - network
@@ -38,7 +41,7 @@ export class AppComponent implements OnInit {
 
       // FIRST request is of type options - Request Method: OPTIONS - that will check whether the post request is allowed to be sent
       // and if it gets a success response, it will send the actual request which will be the SECOND request - Request Method: POST      
-      // 
+      
   };
 
   onFetchPosts() {
@@ -55,6 +58,6 @@ export class AppComponent implements OnInit {
     // Send Http request
   }
 
-  
+
 
 }
