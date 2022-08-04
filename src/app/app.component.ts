@@ -7,11 +7,15 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+
   loadedPosts = [];
 
   constructor( private http: HttpClient ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    // whenever this page/app loads, I want to fetch all posts
+    this.fetchPosts();
+  }
 
   onCreatePost( postData: { title: string; content: string } ) {
     // Send Http request
@@ -30,34 +34,36 @@ export class AppComponent implements OnInit {
         // the httpClient will give you more than just the response
         // it will automatically extract the data attached to the response (the repsonse body)
         console.log(responseData);
-
         // if you visit the url below - you can see the newly created posts with their title and content 
         // https://console.firebase.google.com/project/angular-firebase-ff3a9/database/angular-firebase-ff3a9-default-rtdb/data        
-      });
-      
+      }); 
       // in the web browser - developer tools - network
       // we can see two requests to the POST end point
       // note: its not '/post' but TYPE of post - the .post() above
 
       // FIRST request is of type options - Request Method: OPTIONS - that will check whether the post request is allowed to be sent
-      // and if it gets a success response, it will send the actual request which will be the SECOND request - Request Method: POST      
-      
+      // and if it gets a success response, it will send the actual request which will be the SECOND request - Request Method: POST    
   };
 
-  onFetchPosts() {
-    // Send Http request
-    this.http.get(
-      'https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/gets.json'
-        
-    ).subscribe(responseData => {
-      console.log(responseData)
-    })
-  }
+  onFetchPosts() {    
+    this.fetchPosts();
+  };
 
   onClearPosts() {
     // Send Http request
-  }
+  };
 
+  private fetchPosts(){
+    this.http.get('https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/posts.json')
+    // since this is a GET request - there is no need for a second argument
+    // get request have no request body since we are not sending any data..(duh - refresher) ONLY REQUESTING data
+    .subscribe( // we stil need to subscribe!!
+      posts => {
+        console.log(posts);
+      }
+    );
+    // since we call this function in the ngOnInit() - if we go to the web broswer console 
+    // we get see all the posts that have been made
+  };
 
-
-}
+};
