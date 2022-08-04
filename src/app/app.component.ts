@@ -9,29 +9,52 @@ import { HttpClient } from '@angular/common/http';
 export class AppComponent implements OnInit {
   loadedPosts = [];
 
-  constructor(private http: HttpClient) {}
+  constructor( private http: HttpClient ) {}
 
   ngOnInit() {}
 
-  onCreatePost(postData: { title: string; content: string }) {
+  onCreatePost( postData: { title: string; content: string } ) {
     // Send Http request
     console.log(postData);
     this.http
       .post(
         // 'https://ng-complete-guide-c56d3.firebaseio.com/posts.json',
-        'https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/posts.json',
+        'https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/posts.json', // .json is a requirement when using Firebase..
         postData
       )
-      .subscribe(responseData => {
+      // angular is HEAVILY reliant on Observables - same with HTTP 
+      // we subscribe to get informed about the response and to handle errors and so on
+      // if we DON'T subscribe - Angular and RxJS will know that no one's interested in the response therefore
+      //  the request doesn't even get sent because if no one's intrested in the response then it won't send the request!
+      .subscribe( responseData => { 
+        // the httpClient will give you more than just the response
+        // it will automatically extract the data attached to the response (the repsonse body)
         console.log(responseData);
       });
-  }
+      
+      // in the web browser - developer tools - network
+      // we can see two requests to the POST end point
+      // note: its not '/post' but TYPE of post - the .post() above
+
+      // FIRST request is of type options - Request Method: OPTIONS - that will check whether the post request is allowed to be sent
+      // and if it gets a success response, it will send the actual request which will be the SECOND request - Request Method: POST      
+      // 
+  };
 
   onFetchPosts() {
     // Send Http request
+    this.http.get(
+      'https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/gets.json'
+        
+    ).subscribe(responseData => {
+      console.log(responseData)
+    })
   }
 
   onClearPosts() {
     // Send Http request
   }
+
+  
+
 }
