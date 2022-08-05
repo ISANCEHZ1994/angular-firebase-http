@@ -12,6 +12,7 @@ import { map } from 'rxjs/operators';
 export class AppComponent implements OnInit {
 
   loadedPosts: Post[] = [];
+  isFetching = false;
 
   constructor( private http: HttpClient ) {}
 
@@ -26,7 +27,7 @@ export class AppComponent implements OnInit {
     console.log(postData);
     this.http
       .post<{ name: string }>( // again all http methods are genertic which means they can have optional brackets for a specific type
-        // 'https://ng-complete-guide-c56d3.firebaseio.com/posts.json',
+        // 'https://console.firebase.google.com/project/angular-firebase-ff3a9/database/angular-firebase-ff3a9-default-rtdb/data,
         'https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/posts.json', // .json is a requirement when using Firebase..
         postData
       )
@@ -60,6 +61,7 @@ export class AppComponent implements OnInit {
   // since we call this function in the ngOnInit() - if we go to the web broswer console 
   // we get see all the posts that have been made
   private fetchPosts(){
+    this.isFetching = true;
     this.http
     // GET is considered a generic method which means we can add the angle brackets and in between store the type of response the body will return
     // NOTE: the <> are totally optional - we are soley using to make full use of TypeScript security
@@ -83,6 +85,7 @@ export class AppComponent implements OnInit {
     .subscribe( // we stil need to subscribe!!
       posts => {
         console.log(posts);
+        this.isFetching = false;
         this.loadedPosts = posts;
       }
     );
