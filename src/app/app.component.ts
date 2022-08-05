@@ -11,7 +11,7 @@ import { map } from 'rxjs/operators';
 })
 export class AppComponent implements OnInit {
 
-  loadedPosts = [];
+  loadedPosts: Post[] = [];
 
   constructor( private http: HttpClient ) {}
 
@@ -70,7 +70,7 @@ export class AppComponent implements OnInit {
       map(( // map is a function that takes another function 
         responseData: { [key: string]: Post } // we are using TypeScript to specificlly say what the return data should be so we can actually 
       ) => { 
-        const postsArray: Post[] = []; // is an empty array with the specific type Post
+        const postsArray: Post[] = []; // is an empty array with the specific type: Post
 
         for( const key in responseData ){ // for-in loop to go thru all they keys in response data which we know will be an object
           if( responseData.hasOwnProperty(key) ){
@@ -83,6 +83,7 @@ export class AppComponent implements OnInit {
     .subscribe( // we stil need to subscribe!!
       posts => {
         console.log(posts);
+        this.loadedPosts = posts;
       }
     );
     
