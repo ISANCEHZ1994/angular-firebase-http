@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Post } from './post.model';
 
 import { map } from 'rxjs/operators';
 
@@ -19,11 +20,12 @@ export class AppComponent implements OnInit {
     this.fetchPosts();
   }
 
-  onCreatePost( postData: { title: string; content: string } ) {
+  // { title: string; content: string } - moved to post.model.ts file!
+  onCreatePost( postData: Post ) {
     // Send Http request
     console.log(postData);
     this.http
-      .post(
+      .post<{ name: string }>( // again all http methods are genertic which means they can have optional brackets for a specific type
         // 'https://ng-complete-guide-c56d3.firebaseio.com/posts.json',
         'https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/posts.json', // .json is a requirement when using Firebase..
         postData
@@ -55,17 +57,24 @@ export class AppComponent implements OnInit {
     // Send Http request
   };
 
+  // since we call this function in the ngOnInit() - if we go to the web broswer console 
+  // we get see all the posts that have been made
   private fetchPosts(){
-    this.http.get('https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/posts.json')
+    this.http
+    // GET is considered a generic method which means we can add the angle brackets and in between store the type of response the body will return
+    // NOTE: the <> are totally optional - we are soley using to make full use of TypeScript security
+    .get<{[key: string]: Post}>('https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/posts.json')
     // since this is a GET request - there is no need for a second argument
     // get request have no request body since we are not sending any data..(duh - refresher) ONLY REQUESTING data
-    .pipe( // allows you to funnel your observalble data through multiple operators before they reach the subscribe method
-      map( responseData => {
-        const postsArray = [];
+    .pipe( // pipe allows you to funnel your observalble data through multiple operators before they reach the subscribe method   
+      map(( // map is a function that takes another function 
+        responseData: { [key: string]: Post } // we are using TypeScript to specificlly say what the return data should be so we can actually 
+      ) => { 
+        const postsArray: Post[] = []; // is an empty array with the specific type Post
 
-        for( const key in responseData ){
+        for( const key in responseData ){ // for-in loop to go thru all they keys in response data which we know will be an object
           if( responseData.hasOwnProperty(key) ){
-            postsArray.push({ ...responseData[key], id: key })
+            postsArray.push({ ...responseData[key], id: key }) // we want to push in a new object there so we add curly bois {}
           } 
         };
         return postsArray;
@@ -76,8 +85,7 @@ export class AppComponent implements OnInit {
         console.log(posts);
       }
     );
-    // since we call this function in the ngOnInit() - if we go to the web broswer console 
-    // we get see all the posts that have been made
+    
   };
 
 };
