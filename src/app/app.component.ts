@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
+import { map } from 'rxjs/operators';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -57,6 +59,18 @@ export class AppComponent implements OnInit {
     this.http.get('https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/posts.json')
     // since this is a GET request - there is no need for a second argument
     // get request have no request body since we are not sending any data..(duh - refresher) ONLY REQUESTING data
+    .pipe( // allows you to funnel your observalble data through multiple operators before they reach the subscribe method
+      map( responseData => {
+        const postsArray = [];
+
+        for( const key in responseData ){
+          if( responseData.hasOwnProperty(key) ){
+            postsArray.push({ ...responseData[key], id: key })
+          } 
+        };
+        return postsArray;
+      })
+    )
     .subscribe( // we stil need to subscribe!!
       posts => {
         console.log(posts);
