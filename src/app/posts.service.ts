@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
+import { map } from 'rxjs/operators';
 
 import { Post } from "./post.model";
 
@@ -8,9 +9,11 @@ import { Post } from "./post.model";
 })
 export class PostsService {
 
+    loadedPosts: Post[] = [];
+
     constructor( private http: HttpClient ) {}
 
-    // Original funciton with notes in app.component.ts file
+    // Original funciton with more notes in app.component.ts file
     createAndStorePost( title: string, content: string ) {
         const postData: Post = { title: title, content: content };
         this.http
@@ -27,8 +30,41 @@ export class PostsService {
         }); 
     };
 
-    fetchPosts(){
-        // ...
+    fetchPosts(){  
+        // change so that we RETURN the list of posts (using get) so we don't use subscribe any more
+        // HTTP request get sent because requests are only sent when someone is interested
+        return this.http
+        // GET is considered a generic method which means we can add the angle brackets and in between store the type of response the body will return
+        // NOTE: the <> are totally optional - we are soley using to make full use of TypeScript security
+        .get<{[key: string]: Post}>('https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/posts.json')
+        // since this is a GET request - there is no need for a second argument
+        // get request have no request body since we are not sending any data..(duh - refresher) ONLY REQUESTING data
+        .pipe( // pipe allows you to funnel your observalble data through multiple operators before they reach the subscribe method   
+            map(( // map is a function that takes another function 
+                responseData: { [key: string]: Post } // we are using TypeScript to specificlly say what the return data should be so we can actually 
+            ) => { 
+                const postsArray: Post[] = []; // is an empty array with the specific type: Post
+
+                for( const key in responseData ){ // for-in loop to go thru all they keys in response data which we know will be an object
+                    if( responseData.hasOwnProperty(key) ){
+                        postsArray.push({ ...responseData[key], id: key }) // we want to push in a new object there so we add curly bois {}
+                    }
+                };
+                return postsArray;
+            })
+        );
+        // switched to just RETURN information thus Subscribe is not needed HERE - look at app.component.ts: ngOnItnit()
+        // NOTE: we CAN use it here but the RETURN at the begining needs to be removed
+        // .subscribe( 
+        //     posts => {
+        //        console.log(posts);
+        //        this.loadedPosts = posts;
+        //     }
+        // );
+    };
+
+    deletePosts(){
+        return this.http.delete('https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/posts.json');
     };
 
 };

@@ -19,7 +19,14 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     // whenever this page/app loads, I want to fetch all posts
-    this.fetchPosts();
+    // this.fetchPosts();
+    this.isFetching = true;
+    this.postsService.fetchPosts().subscribe(
+      posts => {
+        this.isFetching = false;
+        this.loadedPosts = posts;
+      }
+    );
   }
 
   // { title: string; content: string } - moved to post.model.ts file!
@@ -52,45 +59,50 @@ export class AppComponent implements OnInit {
   };
 
   onFetchPosts() {    
-    this.fetchPosts();
-  };
-
-  onClearPosts() {
-    // Send Http request
-  };
-
-  // since we call this function in the ngOnInit() - if we go to the web broswer console 
-  // we get see all the posts that have been made
-  private fetchPosts(){
     this.isFetching = true;
-    this.http
-    // GET is considered a generic method which means we can add the angle brackets and in between store the type of response the body will return
-    // NOTE: the <> are totally optional - we are soley using to make full use of TypeScript security
-    .get<{[key: string]: Post}>('https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/posts.json')
-    // since this is a GET request - there is no need for a second argument
-    // get request have no request body since we are not sending any data..(duh - refresher) ONLY REQUESTING data
-    .pipe( // pipe allows you to funnel your observalble data through multiple operators before they reach the subscribe method   
-      map(( // map is a function that takes another function 
-        responseData: { [key: string]: Post } // we are using TypeScript to specificlly say what the return data should be so we can actually 
-      ) => { 
-        const postsArray: Post[] = []; // is an empty array with the specific type: Post
-
-        for( const key in responseData ){ // for-in loop to go thru all they keys in response data which we know will be an object
-          if( responseData.hasOwnProperty(key) ){
-            postsArray.push({ ...responseData[key], id: key }) // we want to push in a new object there so we add curly bois {}
-          } 
-        };
-        return postsArray;
-      })
-    )
-    .subscribe( // we stil need to subscribe!!
+    this.postsService.fetchPosts().subscribe(
       posts => {
-        console.log(posts);
         this.isFetching = false;
         this.loadedPosts = posts;
       }
     );
-    
+    // function is below!
+    // this.fetchPosts();
+  };
+
+  onClearPosts() {
+    // Send Http request
+    this.postsService.deletePosts().subscribe(() => {
+      this.loadedPosts = [];
+      
+    });
+  };
+
+  // ALSO MOVED to posts.service.ts
+  // thus no longer NEEDED
+  private fetchPosts(){       
+    // this.http
+    // .get<{[key: string]: Post}>('https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/posts.json')
+    // .pipe( 
+    //   map(( 
+    //     responseData: { [key: string]: Post }
+    //   ) => { 
+    //     const postsArray: Post[] = []; 
+
+    //     for( const key in responseData ){ 
+    //       if( responseData.hasOwnProperty(key) ){
+    //         postsArray.push({ ...responseData[key], id: key }) 
+    //       } 
+    //     };
+    //     return postsArray;
+    //   })
+    // ).subscribe( 
+    //   posts => {
+    //     console.log(posts);
+    //     this.isFetching = false;
+    //     this.loadedPosts = posts;
+    //   }
+    // );    
   };
 
 };
