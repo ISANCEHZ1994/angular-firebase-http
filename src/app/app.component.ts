@@ -21,6 +21,9 @@ export class AppComponent implements OnInit {
   constructor( private http: HttpClient, private postsService: PostsService ) {}
 
   ngOnInit() {
+    this.postsService.error.subscribe( errorMessage => {
+      this.error = errorMessage;
+    });
     // whenever this page/app loads, I want to fetch all posts
     // this.fetchPosts();
     this.isFetching = true;

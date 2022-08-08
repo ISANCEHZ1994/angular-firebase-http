@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { map } from 'rxjs/operators';
+import { Subject } from "rxjs";
 
 import { Post } from "./post.model";
 
@@ -9,7 +10,7 @@ import { Post } from "./post.model";
 })
 export class PostsService {
 
-    loadedPosts: Post[] = [];
+    error = new Subject<string>();
 
     constructor( private http: HttpClient ) {}
 
@@ -27,6 +28,8 @@ export class PostsService {
             // it will automatically extract the data attached to the response ( the repsonse body )
             // if you visit the url below - you can see the newly created posts with their title and content 
             // https://console.firebase.google.com/project/angular-firebase-ff3a9/database/angular-firebase-ff3a9-default-rtdb/data       
+        }, error => {
+            this.error.next(error.message);
         }); 
     };
 
