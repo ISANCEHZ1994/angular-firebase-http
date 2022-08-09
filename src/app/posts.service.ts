@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Post } from "./post.model";
 import { map, catchError } from 'rxjs/operators';
 // Subject is a special type of Observable that allows values to be multicasted to many Observers. 
@@ -36,17 +36,29 @@ export class PostsService {
     };
 
     fetchPosts(){  
+        // if we wanted to set multiple params - add a <Search Params> constant
+        let searchParams = new HttpParams();
+        searchParams = searchParams.append('print', 'pretty');
+        searchParams = searchParams.append('custom', 'key');
         // change so that we RETURN the list of posts (using get) so we don't use subscribe any more
         // HTTP request get sent because requests are only sent when someone is interested
         return this.http
         // GET is considered a generic method which means we can add the angle brackets and in between store the type of response the body will return
         // NOTE: the <> are totally optional - we are soley using to make full use of TypeScript security
-        .get<{ [key: string]: Post }>('https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/posts.json',
-        {
-            // remember that headers are KEY : VALUE pairs
-            headers: new HttpHeaders({ 'Custom-Header' : 'Hello' })
-            // if we check the headers inside of the browswer web tools - we can see: Custom-Header: Hello 
-        })
+        .get<{ [key: string]: Post }>(
+            'https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/posts.json',
+            {
+                // remember that headers are KEY : VALUE pairs
+                // if we check the headers inside of the browswer web tools - we can see: Custom-Header: Hello 
+                headers: new HttpHeaders({ 'Custom-Header' : 'Hello' }),               
+                params:  searchParams
+                // new HttpParams().set('print', 'pretty') 
+                // we can set param name and value - changes the format in which Firebase returns its data
+                // if we check Request URL: '' <== it would be the same URL ABOVE 
+                // WITH the added params at the end: 'firebaseio.com/posts.json?print=pretty'
+                // of course we can also change the URL MANUALLY but this way is more convenient
+            }
+        )
         // since this is a GET request - there is no need for a second argument
         // get request have no request body since we are not sending any data..(duh - refresher) ONLY REQUESTING data
         .pipe( // pipe allows you to funnel your observalble data through multiple operators before they reach the subscribe method   
