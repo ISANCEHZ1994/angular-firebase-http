@@ -1,8 +1,10 @@
 // https://console.firebase.google.com/project/angular-firebase-ff3a9/database/angular-firebase-ff3a9-default-rtdb/rules
 // if we go to the URL above we can change the rules and 'lock' the database by changing read: false
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
+// Subscription is an object that represents a disposable resource, usually the execution of an Observable
+import { Subscription } from 'rxjs';
 
 import { PostsService } from './posts.service';
 import { Post } from './post.model';
@@ -12,16 +14,17 @@ import { Post } from './post.model';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
 
   loadedPosts: Post[] = [];
   isFetching = false;
-  error = null; 
+  error = null;
+  private errorSub: Subscription; 
 
   constructor( private http: HttpClient, private postsService: PostsService ) {}
 
   ngOnInit() {
-    this.postsService.error.subscribe( errorMessage => {
+    this.errorSub = this.postsService.error.subscribe( errorMessage => {
       this.error = errorMessage;
     });
     // whenever this page/app loads, I want to fetch all posts
@@ -36,7 +39,7 @@ export class AppComponent implements OnInit {
         this.error = error.message;
       }
     );
-  }
+  };
 
   // { title: string; content: string } - moved to post.model.ts file!
   // NOTE: we have moved the function below to posts.service.ts 
@@ -88,6 +91,10 @@ export class AppComponent implements OnInit {
       this.loadedPosts = [];
 
     });
+  };
+
+  ngOnDestroy(){
+    this.errorSub.unsubscribe();
   };
 
   // ALSO MOVED to posts.service.ts

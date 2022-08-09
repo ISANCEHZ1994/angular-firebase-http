@@ -1,9 +1,12 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
+import { Post } from "./post.model";
 import { map } from 'rxjs/operators';
+// Subject is a special type of Observable that allows values to be multicasted to many Observers. 
+// While plain Observables are unicast (each subscribed Observer owns 
+// an independent execution of the Observable), Subjects are multicast.
 import { Subject } from "rxjs";
 
-import { Post } from "./post.model";
 
 @Injectable({
     providedIn: 'root'
