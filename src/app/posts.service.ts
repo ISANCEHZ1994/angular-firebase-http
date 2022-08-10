@@ -58,13 +58,19 @@ export class PostsService {
             {
                 // remember that headers are KEY : VALUE pairs
                 // if we check the headers inside of the browswer web tools - we can see: Custom-Header: Hello 
-                headers: new HttpHeaders({ 'Custom-Header' : 'Hello' }),               
-                params:  searchParams
+                headers: new HttpHeaders({ 'Custom-Header' : 'Hello' }),                            
+                params:  searchParams,
                 // NOTE: before it was -- params: new HttpParams().set('print', 'pretty') 
                 // we can set param name and value - changes the format in which Firebase returns its data
                 // if we check Request URL in the web browser tools: '' <== it would be the same URL ABOVE 
                 // WITH the added params at the end: 'firebaseio.com/posts.json?print=pretty'
-                // of course we can also change the URL MANUALLY but this way is more convenient
+                // of course we can also change the URL MANUALLY but this way is more convenient   
+                // now we have multiple params added!
+                responseType: 'json' 
+                // we cant use the text responseType because we are using that generic assignment - note before we had responseType: 'text'
+                // the data that is returned is type JavaScript object that holds a nested POST
+                // the error is from TypeScript being smart - if you say that the response data will be of that format
+                // then it needs to be convertible to JavaScript object
             }
         )
         // since this is a GET request - there is no need for a second argument
@@ -101,9 +107,10 @@ export class PostsService {
         return this.http.delete(
             'https://angular-firebase-ff3a9-default-rtdb.firebaseio.com/posts.json',
             {
-                observe: 'events' // events
-            }
-            ).pipe(
+                observe: 'events',
+                responseType: 'text'
+            })
+            .pipe(
                 tap( event => { // tap allows us to execute some code WITHOUT ALTERING the response
                                 // basically do something to the response without disturbing 
                                 // our Subscribe function and the functions we passed as arguments
