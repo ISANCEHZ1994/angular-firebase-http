@@ -7,7 +7,7 @@ export class AuthInterceptorService implements HttpInterceptor{
     // HttpRequest is a generic type/generic object so we can use the angled brackets 
     intercept( req: HttpRequest<any>, next: HttpHandler ) {
         console.log('Request is on the way');
-
+        console.log(req.url);
         // req.url = ''; <== this will not work - we need to create a new one!
         const modifedRequest = req.clone({ // with clone we can now change core aspects such as:
             // url: 'some-new-url'
@@ -18,7 +18,7 @@ export class AuthInterceptorService implements HttpInterceptor{
             // we can now see Auth: xyz inside the Request Headers
          }); 
          // instead of using the origianl request we want to use the MODIFIED VERSION - duh why make it and not use it?
-
+        console.log(modifedRequest);
         return next.handle(modifedRequest); // next is a function/object that allows the request to continue its journey
     };
 
