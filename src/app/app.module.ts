@@ -5,6 +5,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { AuthInterceptorService } from './auth-interceptor.service';
+import { LoggingInterceoptorService } from './logging-interceptor.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -16,11 +17,19 @@ import { AuthInterceptorService } from './auth-interceptor.service';
   // their intercept method whenever a request leaves the application
   // useClass: <SERVICE NAME WE CREATED>
   // multi: true - have multiple services under that identifier <HTTP_INTERCEPTORS>
-  providers: [{
-    provide:  HTTP_INTERCEPTORS,
-    useClass: AuthInterceptorService,
-    multi:    true
-  }],
+  providers: [
+    // if we change the orders of objects
+    {
+      provide:  HTTP_INTERCEPTORS,
+      useClass: AuthInterceptorService,
+      multi:    true
+    },
+    { // multiple interceptors - the same but with a different useClass..makes sense my guy (DUH)
+      provide:  HTTP_INTERCEPTORS,
+      useClass: LoggingInterceoptorService,
+      multi:    true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
